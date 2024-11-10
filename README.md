@@ -15,14 +15,14 @@ Este proyecto es una API REST construida con Node.js, Express y TypeScript. La A
 - [Licencia](#licencia)
 - [Autor](#autor)
 
-### Tambien puede consultar
+### También puede consultar
 
-- [Documento de **pasos para crear este preycto**](/docs/creacion-configuraciones-inciales.md)
+- [Documento de **pasos para crear este proyecto**](/docs/creacion-configuraciones-inciales.md)
 
 ## Requisitos
 
-- **Node.js** v14 o superior
-- **npm** v6 o superior (incluido con Node.js)
+- **Node.js** v20 o superior
+- **npm** v10 o superior (incluido con Node.js)
 - **TypeScript** (instalado globalmente si se prefiere)
 
 ## Instalación
@@ -30,7 +30,7 @@ Este proyecto es una API REST construida con Node.js, Express y TypeScript. La A
 1. Clona el repositorio:
 
     ```bash
-    git clone <URL-del-repositorio>
+    git clone https://github.com/runinbk/API-APP-Odoo.git
     ```
 
 2. Entra en el directorio del proyecto:
@@ -114,6 +114,8 @@ api-app-odoo/
 
 - **Iniciar el servidor de desarrollo**:
 
+    Este comando ejecutará `tsc --watch` y el servidor en paralelo usando `concurrently`, lo cual facilita el desarrollo al recargar automáticamente cada vez que hay cambios.
+
     ```bash
     npm run dev
     ```
@@ -123,12 +125,65 @@ api-app-odoo/
     ```bash
     npm run build
     ```
+    Tambien puedes usar el siguiente comando:
+    ```bash
+    tsc --watch
+    ```
+
+- **Ejecutar el servidor**:
+
+    ```bash
+    npm run start
+    ```
 
 - **Ejecutar tests**:
 
     ```bash
     npm test
     ```
+
+### Recomendaciones adicionales
+
+Parece que tienes un buen flujo de trabajo al usar `tsc --watch` para compilar automáticamente los archivos TypeScript. Sin embargo, te sigue dando el error `Cannot find module 'dist/app.js'`. Esto indica que algo aún impide que el archivo JavaScript se genere correctamente en la carpeta `dist`.
+
+A continuación, algunos pasos adicionales que pueden ayudar a resolver el problema:
+
+1. **Verifica la ubicación de los archivos compilados**:
+   Después de ejecutar `tsc --watch`, asegúrate de que los archivos generados estén realmente en la carpeta `dist`. Si no están allí, podría haber un problema con la configuración en `tsconfig.json`.
+
+2. **Confirma que el archivo principal esté siendo compilado**:
+   Asegúrate de que el archivo principal (por ejemplo, `app.ts` o `server.ts`) esté dentro de la carpeta `src` o en la raíz del proyecto, según hayas configurado `rootDir` en `tsconfig.json`.
+
+3. **Configura `package.json` para `start` y `dev` scripts**:
+   Si `tsc --watch` está corriendo, puedes simplificar tu flujo de trabajo agregando un script de desarrollo en `package.json` que ejecute `tsc --watch` y `node dist/app.js` simultáneamente.
+
+   Aquí tienes un ejemplo usando [concurrently](https://www.npmjs.com/package/concurrently), que permite ejecutar múltiples comandos en paralelo:
+
+   ```bash
+   npm install concurrently --save-dev
+   ```
+
+   Luego, en tu `package.json`, configura los scripts así:
+
+   ```json
+   "scripts": {
+       "build": "tsc",
+       "start": "node dist/app.js",
+       "dev": "concurrently \"tsc --watch\" \"nodemon dist/app.js\""
+   }
+   ```
+
+   Esto te permitirá correr `npm run dev`, que compilará en modo `watch` y ejecutará `nodemon` para reiniciar automáticamente el servidor cada vez que se compile el código.
+
+4. **Verifica si el archivo `app.js` se genera**:
+   Tras hacer estos cambios, ejecuta el siguiente comando en la terminal:
+
+   ```bash
+   npm run dev
+   ```
+
+   Deberías ver tanto la compilación en tiempo real de `tsc --watch` como la ejecución del servidor. Si el archivo `dist/app.js` aún no se genera, puede haber un error de configuración en `tsconfig.json` o en la estructura de tu proyecto.
+
 
 ## Dependencias
 
