@@ -1,6 +1,6 @@
 import express from 'express';
 import { authMiddleware } from '../middleware/auth.js';
-import { syncMiddleware, trackChanges } from '../middleware/syncMiddleware.js';
+import { syncMiddleware } from '../middleware/syncMiddleware.js';
 import syncService from '../services/syncService.js';
 import cacheService from '../services/cacheService.js';
 
@@ -15,17 +15,30 @@ router.get('/changes',
             const { uid, password } = req.user;
             const { lastSyncTimestamp } = req.headers;
 
+            // Intentar obtener desde caché primero
+            const cacheKey = `sync_changes_${uid}_${lastSyncTimestamp}`;
+            const cachedResponse = cacheService.get(cacheKey);
+
+            if (cachedResponse) {
+                return res.json(cachedResponse);
+            }
+
             const changes = await syncService.getChanges(
                 uid,
                 password,
                 lastSyncTimestamp || new Date(0).toISOString()
             );
 
-            res.json({
+            const response = {
                 changes,
                 timestamp: Date.now(),
                 nextSync: Date.now() + (30 * 60 * 1000) // 30 minutos
-            });
+            };
+
+            // Cachear respuesta por 5 minutos
+            cacheService.set(cacheKey, response, 300);
+
+            res.json(response);
         } catch (error) {
             console.error('Sync error:', error);
             res.status(500).json({
@@ -44,6 +57,14 @@ router.get('/offline-data',
         try {
             const { uid, password } = req.user;
             const { role } = req.user;
+
+            // Verificar caché primero
+            const cacheKey = `offline_data_${uid}_${role}`;
+            const cachedData = cacheService.get(cacheKey);
+
+            if (cachedData) {
+                return res.json(cachedData);
+            }
 
             // Determinar qué datos necesita el usuario según su rol
             const offlineData = {
@@ -69,6 +90,9 @@ router.get('/offline-data',
 
             // Generar versión offline
             const offlineVersion = syncService.generateOfflineVersion(offlineData);
+
+            // Cachear por 1 hora
+            cacheService.set(cacheKey, offlineVersion, 3600);
 
             res.json(offlineVersion);
         } catch (error) {
@@ -107,6 +131,9 @@ router.post('/sync-local-changes',
                     );
 
                     syncResults.successful.push(change.id);
+
+                    // Invalidar caché relacionada
+                    syncService.invalidateCache(change.model, uid);
                 } catch (error) {
                     syncResults.failed.push({
                         id: change.id,
@@ -115,14 +142,41 @@ router.post('/sync-local-changes',
                 }
             }
 
+            // Actualizar caché de último sync
+            const syncTimestamp = Date.now();
+            cacheService.set(`last_sync_${uid}`, syncTimestamp, 3600);
+
             res.json({
                 syncResults,
-                timestamp: Date.now()
+                timestamp: syncTimestamp
             });
         } catch (error) {
             console.error('Local sync error:', error);
             res.status(500).json({
                 message: 'Error synchronizing local changes',
+                error: error.message
+            });
+        }
+    }
+);
+
+// Nuevo endpoint para precachear datos
+router.post('/precache',
+    authMiddleware,
+    async (req, res) => {
+        try {
+            const { uid, password } = req.user;
+            
+            await syncService.precacheCommonData(uid, password);
+            
+            res.json({
+                message: 'Data precached successfully',
+                timestamp: Date.now()
+            });
+        } catch (error) {
+            console.error('Precache error:', error);
+            res.status(500).json({
+                message: 'Error precaching data',
                 error: error.message
             });
         }
