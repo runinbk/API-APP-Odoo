@@ -8,10 +8,13 @@ import tutorRoutes from './routes/tutor.routes.js';
 import config from './config/config.js';
 import studentModelRoutes from './model/student.model.routes.js'; 
 import tutorModelRoutes from './model/tutor.model.routes.js';
-import cursoModelRoutes from './routes/curso.model.routes.js';
-import gestionModelRoutes from './routes/gestion.model.routes.js';
-import materiaModelRoutes from './routes/materia.model.routes.js';
-import profesorModelRoutes from './routes/profesor.model.routes.js';
+import cursoModelRoutes from './model/curso.model.routes.js';
+import gestionModelRoutes from './model/gestion.model.routes.js';
+import materiaModelRoutes from './model/materia.model.routes.js';
+import profesorModelRoutes from './model/profesor.model.routes.js';
+import administrativoModelRoutes from './model/administrativo.model.routes.js';
+import asignacionModelRoutes from './model/asignacion.model.routes.js';
+import notificacionModelRoutes from './model/notificacion.model.routes.js';
 
 const app = express();
 
@@ -33,6 +36,9 @@ app.use('/api/cursos', cursoModelRoutes);
 app.use('/api/gestiones', gestionModelRoutes);
 app.use('/api/materias', materiaModelRoutes);
 app.use('/api/profesores', profesorModelRoutes);
+app.use('/api/administrativos', administrativoModelRoutes);
+app.use('/api/asignaciones', asignacionModelRoutes);
+app.use('/api/notificaciones', notificacionModelRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
