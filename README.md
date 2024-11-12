@@ -80,3 +80,30 @@ npm run dev
 - Manejo de archivos de audio para transcripción
 - Middleware de autenticación
 - Manejo de errores
+
+
+## Características implementadas:
+
+1. Notificaciones para Tutores:
+
+  - Obtiene notificaciones de todos sus hijos
+  - Incluye información del hijo y curso en cada notificación
+  - Ordenadas por fecha
+  - Opción para filtrar desde hoy
+
+2. Notificaciones para Alumnos:
+
+  - Obtiene notificaciones de su curso
+  - Ordenadas por fecha
+  - Opción para filtrar desde hoy
+
+3. Sistema de Lectura/Recepción:
+
+  - Marca notificaciones como leídas o recibidas
+  - Almacena el estado en la tabla de lecturas
+  - Notifica al profesor cuando un estudiante lee una notificación
+
+4. Ordenamiento y Filtrado:
+
+  - Todas las notificaciones están ordenadas de más antigua a más reciente
+  - Opción para mostrar solo desde la fecha actual
