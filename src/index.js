@@ -7,6 +7,7 @@ import studentRoutes from './routes/student.routes.js';
 import tutorRoutes from './routes/tutor.routes.js';
 import config from './config/config.js';
 import studentModelRoutes from './model/student.model.routes.js'; 
+import tutorModelRoutes from './model/tutor.model.routes.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/tutors', tutorRoutes);
 
 // Models Routes
 app.use('/api/alumnos', studentModelRoutes);
+app.use('/api/tutores', tutorModelRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {

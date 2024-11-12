@@ -1,0 +1,658 @@
+{
+    "collection": {
+      "info": {
+        "_postman_id": "d6ed101a-e22c-4294-baaa-efa2a826a9d3",
+        "name": "Odoo Mobile Gateway",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "updatedAt": "2024-11-12T00:17:50.000Z",
+        "createdAt": "2024-11-11T22:00:20.000Z",
+        "lastUpdatedBy": "39661776",
+        "uid": "39661776-d6ed101a-e22c-4294-baaa-efa2a826a9d3"
+      },
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Login",
+              "id": "e0a8aada-d29f-4b64-bedf-38a2844abbcf",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [ ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"kevin@gmail.com\",\n    \"password\": \"odoo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": [ ],
+              "uid": "39661776-e0a8aada-d29f-4b64-bedf-38a2844abbcf"
+            }
+          ],
+          "id": "4c396bdc-61b6-4332-bf9d-c20f6aab2757",
+          "uid": "39661776-4c396bdc-61b6-4332-bf9d-c20f6aab2757"
+        },
+        {
+          "name": "extra",
+          "item": [
+            {
+              "name": "Teacher",
+              "item": [
+                {
+                  "name": "Create Task",
+                  "id": "a07cf01a-70dd-4aad-942d-45453eff8111",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"title\": \"Tarea de prueba\",\n    \"description\": \"Esta es una tarea de prueba\",\n    \"studentIds\": [2, 3],\n    \"dueDate\": \"2024-12-01\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/teachers/tasks",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "teachers",
+                        "tasks"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-a07cf01a-70dd-4aad-942d-45453eff8111"
+                },
+                {
+                  "name": "Transcribe Audio",
+                  "id": "409e3ae8-2850-4e98-9c0b-49bc1a4b658b",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "audio",
+                          "type": "file",
+                          "value": ""
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/teachers/transcribe-audio",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "teachers",
+                        "transcribe-audio"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-409e3ae8-2850-4e98-9c0b-49bc1a4b658b"
+                }
+              ],
+              "id": "76746605-4457-47a0-a129-8581280974cd",
+              "uid": "39661776-76746605-4457-47a0-a129-8581280974cd"
+            },
+            {
+              "name": "Student",
+              "item": [
+                {
+                  "name": "Get Tasks",
+                  "id": "8a624e40-2ee8-496c-80b9-0b724c2588a9",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/students/tasks",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "students",
+                        "tasks"
+                      ],
+                      "query": [
+                        {
+                          "key": null,
+                          "value": "",
+                          "type": "text",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-8a624e40-2ee8-496c-80b9-0b724c2588a9"
+                }
+              ],
+              "id": "afae8386-f2f1-48ac-9935-75ce4e50669c",
+              "uid": "39661776-afae8386-f2f1-48ac-9935-75ce4e50669c"
+            },
+            {
+              "name": "Tutor",
+              "item": [
+                {
+                  "name": "Get Child Tasks",
+                  "id": "b9252e2c-5d89-402c-88e5-e0536d57e573",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{token}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/api/tutors/children/2/tasks",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutors",
+                        "children",
+                        "2",
+                        "tasks"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-b9252e2c-5d89-402c-88e5-e0536d57e573"
+                }
+              ],
+              "id": "7824114c-7393-4933-966a-bae89cef72b2",
+              "uid": "39661776-7824114c-7393-4933-966a-bae89cef72b2"
+            }
+          ],
+          "id": "cd178b4f-1e22-4a9e-87c8-4214c741d3c4",
+          "uid": "39661776-cd178b4f-1e22-4a9e-87c8-4214c741d3c4"
+        },
+        {
+          "name": "tables-new-module-odoo",
+          "item": [
+            {
+              "name": "alumnos",
+              "item": [
+                {
+                  "name": "get's",
+                  "id": "c40f1ca5-0c9e-4cbf-b220-d60b3d999bee",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/alumnos",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "alumnos"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-c40f1ca5-0c9e-4cbf-b220-d60b3d999bee"
+                },
+                {
+                  "name": "get",
+                  "id": "630e5e02-732c-4e5e-93c0-1c2b37f0c4f2",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/alumnos/2",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "alumnos",
+                        "2"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-630e5e02-732c-4e5e-93c0-1c2b37f0c4f2"
+                },
+                {
+                  "name": "post",
+                  "id": "5dbeb0c5-af28-46e9-b105-8820a13ef179",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [ ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"user_id\": 1,\r\n  \"edad\": 15,\r\n  \"tutor_id\": 1,\r\n  \"grado\": 1\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/alumnos/",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "alumnos",
+                        ""
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-5dbeb0c5-af28-46e9-b105-8820a13ef179"
+                },
+                {
+                  "name": "put",
+                  "id": "394f2a9d-c952-4be7-8bd7-c3091da5f62a",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [ ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"user_id\": 1,\r\n  \"edad\": 5,\r\n  \"tutor_id\": 1,\r\n  \"grado\": 1\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/alumnos/3",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "alumnos",
+                        "3"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-394f2a9d-c952-4be7-8bd7-c3091da5f62a"
+                },
+                {
+                  "name": "delete",
+                  "id": "64042919-4f54-429d-b775-1728a9b2f5cd",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/alumnos/3",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "alumnos",
+                        "3"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-64042919-4f54-429d-b775-1728a9b2f5cd"
+                }
+              ],
+              "id": "c73e3f8f-36a1-4114-8158-7f602c05a048",
+              "uid": "39661776-c73e3f8f-36a1-4114-8158-7f602c05a048"
+            },
+            {
+              "name": "tutor",
+              "item": [
+                {
+                  "name": "get's",
+                  "id": "26a3d7b6-cf3d-45d0-a7ab-28d4df09dc1a",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/tutores",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutores"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-26a3d7b6-cf3d-45d0-a7ab-28d4df09dc1a"
+                },
+                {
+                  "name": "get",
+                  "id": "541823e4-56b6-4dfa-a201-bf8136b2b930",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/tutores/3",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutores",
+                        "3"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-541823e4-56b6-4dfa-a201-bf8136b2b930"
+                },
+                {
+                  "name": "post",
+                  "id": "e6ccb8e7-e650-44f1-91b8-48da9384dc5f",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [ ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"parentesco\": \"Padre\",\r\n    \"user_id\": 1\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/tutores",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutores"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-e6ccb8e7-e650-44f1-91b8-48da9384dc5f"
+                },
+                {
+                  "name": "put",
+                  "id": "c346a055-ab20-44fc-9157-fa6eb17f8dae",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [ ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"parentesco\": \"Madre\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/tutores/3",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutores",
+                        "3"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-c346a055-ab20-44fc-9157-fa6eb17f8dae"
+                },
+                {
+                  "name": "delete",
+                  "id": "75982182-e27a-4f17-a235-0289f2c3e6d0",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [ ],
+                    "url": {
+                      "raw": "{{base_url}}/api/tutores/3",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "tutores",
+                        "3"
+                      ]
+                    }
+                  },
+                  "response": [ ],
+                  "uid": "39661776-75982182-e27a-4f17-a235-0289f2c3e6d0"
+                }
+              ],
+              "id": "a036d5ef-095c-48e6-8b7c-df9e9ad6fa02",
+              "uid": "39661776-a036d5ef-095c-48e6-8b7c-df9e9ad6fa02"
+            }
+          ],
+          "id": "cd88d61b-d7de-48a0-980f-28f7214fb60f",
+          "uid": "39661776-cd88d61b-d7de-48a0-980f-28f7214fb60f"
+        }
+      ],
+      "variable": [
+        {
+          "key": "base_url",
+          "value": "http://localhost:3000",
+          "type": "string"
+        },
+        {
+          "key": "token",
+          "value": "",
+          "type": "string"
+        }
+      ]
+    }
+  }
