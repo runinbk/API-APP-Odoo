@@ -2,9 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
-import teacherRoutes from './routes/teacher.routes.js';
-import studentRoutes from './routes/student.routes.js';
-import tutorRoutes from './routes/tutor.routes.js';
 import config from './config/config.js';
 import studentModelRoutes from './model/student.model.routes.js'; 
 import tutorModelRoutes from './model/tutor.model.routes.js';
@@ -15,8 +12,8 @@ import profesorModelRoutes from './model/profesor.model.routes.js';
 import administrativoModelRoutes from './model/administrativo.model.routes.js';
 import asignacionModelRoutes from './model/asignacion.model.routes.js';
 import notificacionModelRoutes from './model/notificacion.model.routes.js';
-import notificationEnhancedRoutes from './model/notification.enhanced.routes.js';
-import teacherEnhancedRoutes from './model/teacher.enhanced.routes.js';
+import notificationEnhancedRoutes from './routes/notification.enhanced.routes.js';
+import teacherEnhancedRoutes from './routes/teacher.enhanced.routes.js';
 
 const app = express();
 
@@ -27,9 +24,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/teachers', teacherRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/tutors', tutorRoutes);
 
 // Models Routes
 app.use('/api/alumnos', studentModelRoutes);
