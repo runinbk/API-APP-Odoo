@@ -14,6 +14,7 @@ import asignacionModelRoutes from './model/asignacion.model.routes.js';
 import notificacionModelRoutes from './model/notificacion.model.routes.js';
 import notificationEnhancedRoutes from './routes/notification.enhanced.routes.js';
 import teacherEnhancedRoutes from './routes/teacher.enhanced.routes.js';
+import teacherAIRoutes from './routes/teacher.ai.routes.js';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/notificaciones', notificacionModelRoutes);
 // Rutas para consumo de la App
 app.use('/api/enhanced-notifications', notificationEnhancedRoutes);
 app.use('/api/teacher', teacherEnhancedRoutes);
+app.use('/api/teacher-ai', teacherAIRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
