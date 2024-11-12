@@ -1,4 +1,3 @@
-// src/routes/auth.routes.js
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import odooService from '../services/odooService.js';
