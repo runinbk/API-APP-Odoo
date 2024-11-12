@@ -278,3 +278,29 @@
 5. **Roles**:
    - Las rutas mejoradas de notificaciones detectan automáticamente el rol del usuario
    - Los permisos se manejan según el grupo asignado al usuario en Odoo
+
+   ## Características implementadas [(Notificaciones Mejoradas)](#11-notificaciones-mejoradas):
+
+1. Notificaciones para Tutores:
+
+  - Obtiene notificaciones de todos sus hijos
+  - Incluye información del hijo y curso en cada notificación
+  - Ordenadas por fecha
+  - Opción para filtrar desde hoy
+
+2. Notificaciones para Alumnos:
+
+  - Obtiene notificaciones de su curso
+  - Ordenadas por fecha
+  - Opción para filtrar desde hoy
+
+3. Sistema de Lectura/Recepción:
+
+  - Marca notificaciones como leídas o recibidas
+  - Almacena el estado en la tabla de lecturas
+  - Notifica al profesor cuando un estudiante lee una notificación
+
+4. Ordenamiento y Filtrado:
+
+  - Todas las notificaciones están ordenadas de más antigua a más reciente
+  - Opción para mostrar solo desde la fecha actual
