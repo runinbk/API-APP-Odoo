@@ -15,6 +15,7 @@ import profesorModelRoutes from './model/profesor.model.routes.js';
 import administrativoModelRoutes from './model/administrativo.model.routes.js';
 import asignacionModelRoutes from './model/asignacion.model.routes.js';
 import notificacionModelRoutes from './model/notificacion.model.routes.js';
+import notificationEnhancedRoutes from './model/notification.enhanced.routes.js';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/profesores', profesorModelRoutes);
 app.use('/api/administrativos', administrativoModelRoutes);
 app.use('/api/asignaciones', asignacionModelRoutes);
 app.use('/api/notificaciones', notificacionModelRoutes);
+app.use('/api/enhanced-notifications', notificationEnhancedRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
