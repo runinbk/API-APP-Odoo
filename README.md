@@ -111,7 +111,7 @@ npm run dev
 npm start
 ```
 
-## 📝 Ejemplos
+## 📝 [Ejemplos](/documentacion-rutas.md)
 
 ### Autenticación
 ```javascript
