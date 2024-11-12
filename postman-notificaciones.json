@@ -1,0 +1,219 @@
+{
+    "collection": {
+      "info": {
+        "_postman_id": "4c18f1d0-4631-471b-a71f-5d9870d61ba6",
+        "name": "Enhanced Notifications",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "updatedAt": "2024-11-12T05:21:32.000Z",
+        "createdAt": "2024-11-12T05:13:46.000Z",
+        "lastUpdatedBy": "39661776",
+        "uid": "39661776-4c18f1d0-4631-471b-a71f-5d9870d61ba6"
+      },
+      "item": [
+        {
+          "name": "Auth Copy",
+          "item": [
+            {
+              "name": "Login",
+              "id": "c8e2c44f-6d93-4e68-926b-f1ee404186b9",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [ ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"demo4\",\n    \"password\": \"demo4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": [ ],
+              "uid": "39661776-c8e2c44f-6d93-4e68-926b-f1ee404186b9"
+            }
+          ],
+          "id": "844a2a0d-5d6c-43d7-ae90-865451c977fe",
+          "uid": "39661776-844a2a0d-5d6c-43d7-ae90-865451c977fe"
+        },
+        {
+          "name": "Get My Notifications (All)",
+          "id": "9394d2a3-0786-45d6-8885-0d578d998700",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/enhanced-notifications/my-notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "enhanced-notifications",
+                "my-notifications"
+              ]
+            }
+          },
+          "response": [ ],
+          "uid": "39661776-9394d2a3-0786-45d6-8885-0d578d998700"
+        },
+        {
+          "name": "Get My Notifications (From Today)",
+          "id": "3490004a-5f32-4f48-beb8-de6a83610975",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjIsInVzZXJuYW1lIjoia2V2aW5AZ21haWwuY29tIiwicGFzc3dvcmQiOiJvZG9vIiwiaWF0IjoxNzMxMzY3ODM2LCJleHAiOjE3MzE0NTQyMzZ9.drSvQCGreQKnokc2ubNH6SNSgDQdtRfFgrb9ndcNfEI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/enhanced-notifications/my-notifications?fromToday=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "enhanced-notifications",
+                "my-notifications"
+              ],
+              "query": [
+                {
+                  "key": "fromToday",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": [ ],
+          "uid": "39661776-3490004a-5f32-4f48-beb8-de6a83610975"
+        },
+        {
+          "name": "Mark Notification as Read",
+          "id": "df9f0f7b-4fd0-48ee-ba0d-ee113d43219f",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notificationId\": 1,\n    \"action\": \"read\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/enhanced-notifications/mark-notification",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "enhanced-notifications",
+                "mark-notification"
+              ]
+            }
+          },
+          "response": [ ],
+          "uid": "39661776-df9f0f7b-4fd0-48ee-ba0d-ee113d43219f"
+        },
+        {
+          "name": "Mark Notification as Received",
+          "id": "cde6a1c8-a501-46b7-9eaa-6f3498ce459e",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notificationId\": 1,\n    \"action\": \"received\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/enhanced-notifications/mark-notification",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "enhanced-notifications",
+                "mark-notification"
+              ]
+            }
+          },
+          "response": [ ],
+          "uid": "39661776-cde6a1c8-a501-46b7-9eaa-6f3498ce459e"
+        }
+      ]
+    }
+  }
