@@ -4,145 +4,141 @@ import odooService from '../services/odooService.js';
 
 const router = express.Router();
 
-// Función helper para ordenar notificaciones por fecha
-const sortNotifications = (notifications, fromToday = false) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    let filteredNotifications = notifications;
-    if (fromToday) {
-        filteredNotifications = notifications.filter(notif => {
-            const notifDate = new Date(notif.fecha);
-            return notifDate >= today;
-        });
-    }
-
-    return filteredNotifications.sort((a, b) => {
-        const dateA = new Date(a.fecha);
-        const dateB = new Date(b.fecha);
-        return dateA - dateB;
-    });
-};
-
-// Obtener el rol del usuario
-const getUserRole = async (uid, password) => {
-    try {
-        // Buscar en cada modelo de rol
-        const [isStudent, isTutor] = await Promise.all([
-            odooService.executeKw(
-                uid, password,
-                'colegio.alumno',
-                'search_count',
-                [[['user_id', '=', uid]]]
-            ),
-            odooService.executeKw(
-                uid, password,
-                'colegio.tutor',
-                'search_count',
-                [[['user_id', '=', uid]]]
-            )
-        ]);
-
-        if (isStudent) return 'student';
-        if (isTutor) return 'tutor';
-        return null;
-    } catch (error) {
-        console.error('Error getting user role:', error);
-        throw error;
-    }
-};
-
-// Endpoint para obtener notificaciones según rol
 router.get('/my-notifications', authMiddleware, async (req, res) => {
     try {
-        const { uid, password } = req.user;
-        const { fromToday } = req.query;
-        const shouldFilterFromToday = fromToday === 'true';
+        const { uid, password, role } = req.user;
+        
+        console.log('Obteniendo notificaciones para usuario:', {
+            uid,
+            role
+        });
 
-        const userRole = await getUserRole(uid, password);
-
+        let domain = [];
         let notifications = [];
         
-        if (userRole === 'tutor') {
-            // Obtener los hijos del tutor
-            const tutor = await odooService.executeKw(
-                uid, password,
-                'colegio.tutor',
+        try {
+            // Primero intentamos obtener todas las notificaciones dirigidas al usuario
+            notifications = await odooService.execute(
+                uid,
+                password,
+                'colegio.notificacion',
                 'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['alumno_ids'] }
+                [[['user_ids', 'in', [uid]]]],
+                {
+                    fields: [
+                        'titulo',
+                        'mensaje',
+                        'fecha',
+                        'hora',
+                        'tipo',
+                        'lugar',
+                        'fecha_cierre',
+                        'creado_por',
+                        'curso_id',
+                        'tipo_destinatario'
+                    ],
+                    order: 'fecha desc, hora desc'
+                }
             );
-
-            if (tutor.length && tutor[0].alumno_ids.length) {
-                // Obtener notificaciones para cada hijo
-                const childrenNotifications = await Promise.all(
-                    tutor[0].alumno_ids.map(async (childId) => {
-                        // Obtener datos del hijo
-                        const child = await odooService.executeKw(
-                            uid, password,
-                            'colegio.alumno',
-                            'read',
-                            [childId],
-                            { fields: ['user_id', 'grado'] }
-                        );
-
-                        // Obtener notificaciones del curso del hijo
-                        const courseNotifications = await odooService.executeKw(
-                            uid, password,
-                            'colegio.notificacion',
-                            'search_read',
-                            [[['curso_id', '=', child[0].grado[0]]]],
-                            {
-                                fields: [
-                                    'titulo', 'mensaje', 'fecha', 'hora',
-                                    'tipo', 'lugar', 'fecha_cierre'
-                                ]
-                            }
-                        );
-
-                        // Agregar información del hijo a cada notificación
-                        return courseNotifications.map(notif => ({
-                            ...notif,
-                            child_name: child[0].user_id[1],
-                            course_name: child[0].grado[1]
-                        }));
-                    })
-                );
-
-                notifications = [].concat(...childrenNotifications);
+            
+            // También obtenemos las notificaciones generales según el rol
+            let roleDomain = [];
+            switch (role) {
+                case 'student':
+                    roleDomain = [['tipo_destinatario', 'in', ['todos', 'estudiantes']]];
+                    break;
+                case 'teacher':
+                    roleDomain = [['tipo_destinatario', 'in', ['todos', 'profesores']]];
+                    break;
+                case 'tutor':
+                    roleDomain = [['tipo_destinatario', 'in', ['todos', 'tutores']]];
+                    break;
+                case 'admin':
+                    roleDomain = []; // Ver todas
+                    break;
+                default:
+                    roleDomain = [['tipo_destinatario', '=', 'todos']];
             }
-        } else if (userRole === 'student') {
-            // Obtener el curso del alumno
-            const student = await odooService.executeKw(
-                uid, password,
-                'colegio.alumno',
-                'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['grado'] }
-            );
 
-            if (student.length) {
-                notifications = await odooService.executeKw(
-                    uid, password,
+            if (roleDomain.length > 0) {
+                const roleNotifications = await odooService.execute(
+                    uid,
+                    password,
                     'colegio.notificacion',
                     'search_read',
-                    [[['curso_id', '=', student[0].grado[0]]]],
+                    [roleDomain],
                     {
                         fields: [
-                            'titulo', 'mensaje', 'fecha', 'hora',
-                            'tipo', 'lugar', 'fecha_cierre'
-                        ]
+                            'titulo',
+                            'mensaje',
+                            'fecha',
+                            'hora',
+                            'tipo',
+                            'lugar',
+                            'fecha_cierre',
+                            'creado_por',
+                            'curso_id',
+                            'tipo_destinatario'
+                        ],
+                        order: 'fecha desc, hora desc'
                     }
                 );
+                notifications = [...notifications, ...roleNotifications];
             }
+
+        } catch (error) {
+            console.error('Error al obtener notificaciones específicas:', error);
+            // Continuamos con las notificaciones generales
         }
 
-        // Ordenar y filtrar notificaciones
-        const sortedNotifications = sortNotifications(notifications, shouldFilterFromToday);
+        // Eliminar duplicados si los hay
+        notifications = Array.from(new Set(notifications.map(n => n.id)))
+            .map(id => notifications.find(n => n.id === id));
 
-        res.json(sortedNotifications);
+        // Ordenar por fecha y hora
+        notifications.sort((a, b) => {
+            const dateA = new Date(a.fecha + ' ' + (a.hora || '00:00'));
+            const dateB = new Date(b.fecha + ' ' + (b.hora || '00:00'));
+            return dateB - dateA;
+        });
+
+        // Obtener estado de lectura para cada notificación
+        const notificationsWithReadStatus = await Promise.all(
+            notifications.map(async (notif) => {
+                try {
+                    const lecturas = await odooService.execute(
+                        uid,
+                        password,
+                        'colegio.lectura',
+                        'search_read',
+                        [[
+                            ['notificacion_id', '=', notif.id],
+                            ['user_id', '=', uid]
+                        ]],
+                        { fields: ['estado'] }
+                    );
+
+                    return {
+                        ...notif,
+                        estado: lecturas.length > 0 ? lecturas[0].estado : 'No leído'
+                    };
+                } catch (error) {
+                    return {
+                        ...notif,
+                        estado: 'No leído'
+                    };
+                }
+            })
+        );
+
+        res.json({
+            role,
+            total: notificationsWithReadStatus.length,
+            notifications: notificationsWithReadStatus
+        });
+
     } catch (error) {
-        console.error('Error fetching notifications:', error);
+        console.error('Error al obtener notificaciones:', error);
         res.status(500).json({
             message: 'Error al obtener notificaciones',
             error: error.message
@@ -150,21 +146,16 @@ router.get('/my-notifications', authMiddleware, async (req, res) => {
     }
 });
 
-// Endpoint para marcar notificación como leída/recibida
-router.post('/mark-notification', authMiddleware, async (req, res) => {
+// Marcar notificación como leída
+router.post('/notifications/:id/read', authMiddleware, async (req, res) => {
     try {
         const { uid, password } = req.user;
-        const { notificationId, action } = req.body; // action puede ser 'read' o 'received'
+        const notificationId = parseInt(req.params.id);
 
-        if (!notificationId || !action) {
-            return res.status(400).json({
-                message: 'Se requiere ID de notificación y tipo de acción'
-            });
-        }
-
-        // Verificar si ya existe una lectura para este usuario y notificación
-        const existingReading = await odooService.executeKw(
-            uid, password,
+        // Verificar si ya existe una lectura
+        const lecturas = await odooService.execute(
+            uid,
+            password,
             'colegio.lectura',
             'search_read',
             [[
@@ -173,52 +164,33 @@ router.post('/mark-notification', authMiddleware, async (req, res) => {
             ]]
         );
 
-        if (existingReading.length) {
+        if (lecturas.length > 0) {
             // Actualizar lectura existente
-            await odooService.executeKw(
-                uid, password,
+            await odooService.execute(
+                uid,
+                password,
                 'colegio.lectura',
                 'write',
-                [[existingReading[0].id], {
-                    estado: action === 'read' ? 'Leído' : 'Recibido'
-                }]
+                [[lecturas[0].id], { estado: 'Leído' }]
             );
         } else {
             // Crear nueva lectura
-            await odooService.executeKw(
-                uid, password,
+            await odooService.execute(
+                uid,
+                password,
                 'colegio.lectura',
                 'create',
                 [{
                     notificacion_id: notificationId,
                     user_id: uid,
-                    estado: action === 'read' ? 'Leído' : 'Recibido'
+                    estado: 'Leído'
                 }]
             );
         }
 
-        // Notificar al profesor si es un estudiante marcando como leído
-        const userRole = await getUserRole(uid, password);
-        if (userRole === 'student' && action === 'read') {
-            const notification = await odooService.executeKw(
-                uid, password,
-                'colegio.notificacion',
-                'read',
-                [notificationId],
-                { fields: ['creado_por'] }
-            );
-
-            if (notification[0].creado_por) {
-                // Aquí podrías implementar una notificación al profesor
-                // Por ejemplo, crear un registro en una tabla de notificaciones para profesores
-            }
-        }
-
-        res.json({
-            message: `Notificación marcada como ${action === 'read' ? 'leída' : 'recibida'}`
-        });
+        res.json({ message: 'Notificación marcada como leída' });
     } catch (error) {
-        console.error('Error marking notification:', error);
+        console.error('Error al marcar notificación:', error);
         res.status(500).json({
             message: 'Error al marcar notificación',
             error: error.message

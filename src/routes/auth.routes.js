@@ -15,8 +15,15 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Autenticar con Odoo
+        // Autenticar con Odoo - ahora ya incluye el rol
         const authResult = await odooService.authenticate(username, password);
+        console.log('Resultado de autenticación:', {
+            uid: authResult.uid,
+            name: authResult.name,
+            login: authResult.login,
+            email: authResult.email,
+            role: authResult.role
+        });
 
         // Generar token JWT
         const token = jwt.sign(
@@ -24,7 +31,9 @@ router.post('/login', async (req, res) => {
                 uid: authResult.uid,
                 username: authResult.login,
                 name: authResult.name,
-                email: authResult.email
+                email: authResult.email,
+                role: authResult.role,
+                password // Necesario para llamadas posteriores a Odoo
             },
             config.jwtSecret,
             { expiresIn: '24h' }
@@ -37,7 +46,8 @@ router.post('/login', async (req, res) => {
                 uid: authResult.uid,
                 username: authResult.login,
                 name: authResult.name,
-                email: authResult.email
+                email: authResult.email,
+                role: authResult.role
             }
         });
 
@@ -50,7 +60,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Endpoint para verificar token
+// Endpoint de verificación de token
 router.get('/verify', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
@@ -64,7 +74,13 @@ router.get('/verify', async (req, res) => {
         const decoded = jwt.verify(token, config.jwtSecret);
         res.json({
             valid: true,
-            user: decoded
+            user: {
+                uid: decoded.uid,
+                username: decoded.username,
+                name: decoded.name,
+                email: decoded.email,
+                role: decoded.role
+            }
         });
     } catch (error) {
         res.status(401).json({
