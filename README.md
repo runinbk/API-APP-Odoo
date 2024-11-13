@@ -4,6 +4,7 @@ API Gateway para la integración entre una aplicación móvil y un módulo de ag
 
 ## 📋 Tabla de Contenidos
 
+- [Arquitectura](#arquitectura)
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
 - [Configuración](#configuración)
@@ -12,6 +13,80 @@ API Gateway para la integración entre una aplicación móvil y un módulo de ag
 - [Uso](#uso)
 - [Ejemplos](#ejemplos)
 - [Consideraciones de Seguridad](#consideraciones-de-seguridad)
+
+
+## 💻 Arquitectura
+
+```mermaid
+graph TD
+    subgraph Docker["Docker Host"]
+        subgraph Network["Docker Network: odoo-network"]
+            DB[(PostgreSQL DB)]
+            Odoo[Odoo Server]
+            API[API Gateway]
+        end
+        
+        Volumes[("Volumes:
+        odoo-db-data
+        odoo-web-data
+        api-uploads")]
+    end
+    
+    API --> Odoo
+    Odoo --> DB
+    DB -.-> Volumes
+    Odoo -.-> Volumes
+    API -.-> Volumes
+```
+
+## 🌐 Estructura del Proyecto
+
+```mermaid
+graph TD
+    A[API Gateway] --> B[Services]
+    A --> C[Routes]
+    A --> D[Middleware]
+    B --> E[Odoo Service]
+    B --> F[OpenAI Service]
+    B --> G[Cache Service]
+    C --> H[Auth Routes]
+    C --> I[Teacher Routes]
+    C --> J[Student Routes]
+```
+
+## 🐳 Contenedores y Servicios
+
+```mermaid
+flowchart LR
+    subgraph Docker Compose
+        direction TB
+        API[API Gateway<br/>Puerto: 3000]
+        ODOO[Odoo Server<br/>Puerto: 8069]
+        DB[(PostgreSQL<br/>Puerto: 5432)]
+    end
+    
+    API --> ODOO
+    ODOO --> DB
+```
+
+## 📝 Componentes del Sistema
+
+La aplicación está compuesta por tres contenedores Docker principales:
+
+1. **API Gateway (Node.js)**
+   - Maneja peticiones de la app móvil
+   - Gestiona autenticación
+   - Procesa archivos y media
+   - Puerto: 3000
+
+2. **Odoo Server**
+   - Core del sistema
+   - Módulos personalizados
+   - Puerto: 8069
+
+3. **PostgreSQL Database**
+   - Almacenamiento persistente
+   - Puerto: 5432
 
 ## 🔧 Requisitos
 
