@@ -53,6 +53,31 @@ class CacheService {
     has(key) {
         return this.cache.has(key);
     }
+
+    // Limpiar entradas expiradas
+    clearExpired() {
+        return this.cache.prune();
+    }
+
+    // Limpiar toda la caché
+    clear() {
+        return this.cache.flushAll();
+    }
+
+    // Obtener estadísticas
+    getStats() {
+        return this.cache.getStats();
+    }
+
+    // Obtener todas las claves
+    getKeys() {
+        return this.cache.keys();
+    }
+
+    // Obtener cantidad de elementos en caché
+    getSize() {
+        return this.cache.keys().length;
+    }
 }
 
 export default new CacheService();

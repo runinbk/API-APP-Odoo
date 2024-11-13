@@ -21,6 +21,7 @@ import notifEnhancedRoutes from './routes/notification.enhanced.routes.js';
 import teachEnhancedRoutes from './routes/teacher.enhanced.routes.js';
 import teacherAIRoutes from './routes/teacher.ai.routes.js';
 import syncRoutes from './routes/sync.routes.js';
+import monitoringRoutes from './routes/monitoring.routes.js';
 
 // Importar servicios y middlewares
 import { syncMiddleware } from './middleware/syncMiddleware.js';
@@ -30,6 +31,9 @@ import config from './config/config.js';
 // Configuración de la aplicación
 const app = express();
 dotenv.config();
+
+// Constantes de configuración
+const CACHE_CLEANUP_INTERVAL = 1800000; // 30 minutos
 
 // Middleware básico
 app.use(cors());
@@ -60,11 +64,31 @@ app.use('/api/teacher-ai', teacherAIRoutes);
 
 // Rutas de sincronización
 app.use('/api/sync', syncRoutes);
-app.use('/api/sync', syncRoutes);
 
 // Rutas de consumo directo para el movil
 app.use('/api/enhanced-notifications', notifEnhancedRoutes);
 app.use('/api/teacher', teachEnhancedRoutes);
+
+// Ruta de monitoreo
+app.use('/api/monitoring', monitoringRoutes);
+
+// Función de limpieza de caché con manejo de errores
+const cleanupCache = () => {
+    try {
+        const stats = cacheService.getStats();
+        console.log('Estadísticas de caché antes de limpieza:', stats);
+        
+        cacheService.clearExpired();
+        
+        const newStats = cacheService.getStats();
+        console.log('Estadísticas de caché después de limpieza:', newStats);
+    } catch (error) {
+        console.error('Error durante la limpieza de caché:', error);
+    }
+};
+
+// Programar limpieza periódica de caché
+const cacheCleanupInterval = setInterval(cleanupCache, CACHE_CLEANUP_INTERVAL);
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
@@ -75,25 +99,44 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Limpieza periódica de caché
-setInterval(() => {
-    cacheService.clearExpired();
-}, 1800000); // Cada 30 minutos
-
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
     console.log('Entorno:', process.env.NODE_ENV);
     console.log('URL de Odoo:', config.odooConfig.baseUrl);
+    console.log('Limpieza de caché programada cada:', CACHE_CLEANUP_INTERVAL / 60000, 'minutos');
 });
 
 // Manejo de señales de terminación
-process.on('SIGTERM', () => {
-    console.log('SIGTERM recibido. Cerrando servidor...');
-    // Limpiar recursos
-    cacheService.clear();
-    process.exit(0);
-});
+const gracefulShutdown = () => {
+    console.log('Iniciando apagado graceful...');
+    
+    // Limpiar intervalo de caché
+    clearInterval(cacheCleanupInterval);
+    
+    // Limpiar caché
+    try {
+        cacheService.clear();
+        console.log('Caché limpiada exitosamente');
+    } catch (error) {
+        console.error('Error limpiando caché:', error);
+    }
+    
+    // Cerrar servidor
+    server.close(() => {
+        console.log('Servidor HTTP cerrado.');
+        process.exit(0);
+    });
+    
+    // Si el servidor no cierra en 10 segundos, forzar cierre
+    setTimeout(() => {
+        console.error('No se pudo cerrar limpiamente, forzando cierre');
+        process.exit(1);
+    }, 10000);
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
 export default app;
