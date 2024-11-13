@@ -142,20 +142,21 @@ odoo-mobile-gateway/
 │ ├── middleware/
 │ │   ├── auth.js
 │ │   └── syncMiddleware.js
+│ ├── model/
+│ │   └── (modelos de la DB - modulo agenda - odoo)
 │ ├── routes/
 │ │   ├── auth.routes.js
-│ │   ├── teacher.routes.js
-│ │   ├── student.routes.js
-│ │   ├── tutor.routes.js
-│ │   ├── teacher.ai.routes.js
+│ │   ├── monitor.routes.js
+│ │   ├── notification.enhanced.routes.js
 │ │   ├── sync.routes.js
-│ │   └── ... (otros archivos de rutas)
+│ │   ├── teacher.ai.routes.js
+│ │   └── teacher.enhanced.routes.js
 │ ├── services/
+│ │   ├── cacheService.js
+│ │   └── conflictService.js
 │ │   ├── odooService.js
 │ │   ├── openaiService.js
-│ │   ├── cacheService.js
-│ │   ├── syncService.js
-│ │   └── conflictService.js
+│ │   └── syncService.js
 │ └── index.js
 ├── uploads/
 ├── .env
