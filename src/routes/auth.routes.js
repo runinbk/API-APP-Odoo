@@ -5,96 +5,71 @@ import config from '../config/config.js';
 
 const router = express.Router();
 
-// Helper para obtener rol y datos del usuario
-const getUserDetails = async (uid, password) => {
-    try {
-        // Buscar en cada modelo de rol y obtener datos específicos
-        const [
-            profesorData,
-            alumnoData,
-            tutorData,
-            administrativoData
-        ] = await Promise.all([
-            odooService.executeKw(uid, password, 'colegio.profesor', 'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['especialidad', 'asignacion_ids'] }
-            ),
-            odooService.executeKw(uid, password, 'colegio.alumno', 'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['edad', 'grado', 'tutor_id'] }
-            ),
-            odooService.executeKw(uid, password, 'colegio.tutor', 'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['parentesco', 'alumno_ids'] }
-            ),
-            odooService.executeKw(uid, password, 'colegio.administrativo', 'search_read',
-                [[['user_id', '=', uid]]],
-                { fields: ['cargo'] }
-            )
-        ]);
-
-        // Obtener datos del usuario de res.users
-        const userData = await odooService.executeKw(uid, password, 'res.users', 'read',
-            [uid],
-            { fields: ['name', 'email', 'login'] }
-        );
-
-        let role = 'user';
-        let extraData = {};
-
-        if (profesorData.length > 0) {
-            role = 'profesor';
-            extraData = profesorData[0];
-        } else if (alumnoData.length > 0) {
-            role = 'alumno';
-            extraData = alumnoData[0];
-        } else if (tutorData.length > 0) {
-            role = 'tutor';
-            extraData = tutorData[0];
-        } else if (administrativoData.length > 0) {
-            role = 'administrativo';
-            extraData = administrativoData[0];
-        }
-
-        return {
-            ...userData[0],
-            role,
-            ...extraData
-        };
-    } catch (error) {
-        throw error;
-    }
-};
-
 router.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const uid = await odooService.authenticate(username, password);
-        
-        // Obtener detalles completos del usuario
-        const userDetails = await getUserDetails(uid, password);
-        
+
+        if (!username || !password) {
+            return res.status(400).json({
+                message: 'Usuario y contraseña son requeridos'
+            });
+        }
+
+        // Autenticar con Odoo
+        const authResult = await odooService.authenticate(username, password);
+
+        // Generar token JWT
         const token = jwt.sign(
-            { 
-                uid,
-                username,
-                password,
-                role: userDetails.role
+            {
+                uid: authResult.uid,
+                username: authResult.login,
+                name: authResult.name,
+                email: authResult.email
             },
             config.jwtSecret,
             { expiresIn: '24h' }
         );
 
-        res.json({ 
+        // Devolver respuesta
+        res.json({
             token,
-            uid,
-            user: userDetails
+            user: {
+                uid: authResult.uid,
+                username: authResult.login,
+                name: authResult.name,
+                email: authResult.email
+            }
+        });
+
+    } catch (error) {
+        console.error('Error en login:', error);
+        res.status(401).json({
+            message: 'Error de autenticación',
+            error: error.message
+        });
+    }
+});
+
+// Endpoint para verificar token
+router.get('/verify', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({
+                message: 'Token no proporcionado'
+            });
+        }
+
+        const decoded = jwt.verify(token, config.jwtSecret);
+        res.json({
+            valid: true,
+            user: decoded
         });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(401).json({ 
-            message: 'Authentication failed',
-            error: error.message 
+        res.status(401).json({
+            valid: false,
+            message: 'Token inválido'
         });
     }
 });
