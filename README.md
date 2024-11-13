@@ -62,22 +62,34 @@ JWT_SECRET=tu_secreto_jwt
 ```
 odoo-mobile-gateway/
 ├── src/
-│   ├── config/
-│   │   └── config.js
-│   ├── middleware/
-│   │   └── auth.js
-│   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── student.model.routes.js
-│   │   ├── teacher.model.routes.js
-│   │   └── ... otros archivos de rutas
-│   ├── services/
-│   │   ├── odooService.js
-│   │   └── openaiService.js
-│   └── index.js
+│ ├── config/
+│ │   └── config.js
+│ ├── middleware/
+│ │   ├── auth.js
+│ │   └── syncMiddleware.js
+│ ├── routes/
+│ │   ├── auth.routes.js
+│ │   ├── teacher.routes.js
+│ │   ├── student.routes.js
+│ │   ├── tutor.routes.js
+│ │   ├── teacher.ai.routes.js
+│ │   ├── sync.routes.js
+│ │   └── ... (otros archivos de rutas)
+│ ├── services/
+│ │   ├── odooService.js
+│ │   ├── openaiService.js
+│ │   ├── cacheService.js
+│ │   ├── syncService.js
+│ │   └── conflictService.js
+│ └── index.js
+├── uploads/
 ├── .env
 ├── .gitignore
+├── documentacion-rutas.md
+├── example.env
 ├── package.json
+├── postman-notificaciones.json
+├── postman-pruebas.json
 └── README.md
 ```
 
