@@ -34,6 +34,8 @@ dotenv.config();
 
 // Constantes de configuración
 const CACHE_CLEANUP_INTERVAL = 1800000; // 30 minutos
+// const CACHE_CLEANUP_INTERVAL = 600000; // 10 minutos
+// const CACHE_CLEANUP_INTERVAL = 300000; // 5 minutos
 
 // Middleware básico
 app.use(cors());
@@ -75,13 +77,20 @@ app.use('/api/monitoring', monitoringRoutes);
 // Función de limpieza de caché con manejo de errores
 const cleanupCache = () => {
     try {
-        const stats = cacheService.getStats();
-        console.log('Estadísticas de caché antes de limpieza:', stats);
+        const beforeStats = cacheService.getStats();
+        console.log('Estado de caché antes de limpieza:', {
+            totalKeys: beforeStats.totalKeys,
+            memoryUsage: `${Math.round(beforeStats.memoryUsage * 100) / 100} MB`
+        });
         
-        cacheService.clearExpired();
+        const expiredCount = cacheService.clearExpired();
         
-        const newStats = cacheService.getStats();
-        console.log('Estadísticas de caché después de limpieza:', newStats);
+        const afterStats = cacheService.getStats();
+        console.log('Limpieza de caché completada:', {
+            elementosEliminados: expiredCount,
+            keysRestantes: afterStats.totalKeys,
+            memoryUsage: `${Math.round(afterStats.memoryUsage * 100) / 100} MB`
+        });
     } catch (error) {
         console.error('Error durante la limpieza de caché:', error);
     }

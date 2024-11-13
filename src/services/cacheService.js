@@ -56,7 +56,18 @@ class CacheService {
 
     // Limpiar entradas expiradas
     clearExpired() {
-        return this.cache.prune();
+        const keys = this.cache.keys();
+        let expiredCount = 0;
+
+        keys.forEach(key => {
+            const ttl = this.cache.getTtl(key);
+            if (ttl && ttl < Date.now()) {
+                this.cache.del(key);
+                expiredCount++;
+            }
+        });
+
+        return expiredCount;
     }
 
     // Limpiar toda la caché
@@ -66,7 +77,16 @@ class CacheService {
 
     // Obtener estadísticas
     getStats() {
-        return this.cache.getStats();
+        const keys = this.cache.keys();
+        const stats = this.cache.getStats();
+        
+        return {
+            ...stats,
+            totalKeys: keys.length,
+            keys: keys,
+            memoryUsage: process.memoryUsage().heapUsed / 1024 / 1024, // MB
+            timestamp: new Date().toISOString()
+        };
     }
 
     // Obtener todas las claves
@@ -77,6 +97,25 @@ class CacheService {
     // Obtener cantidad de elementos en caché
     getSize() {
         return this.cache.keys().length;
+    }
+
+    // Obtener detalles completos de la caché
+    getDetails() {
+        const keys = this.cache.keys();
+        const details = {};
+
+        keys.forEach(key => {
+            const value = this.cache.get(key);
+            const ttl = this.cache.getTtl(key);
+            details[key] = {
+                value,
+                ttl,
+                expiresAt: ttl ? new Date(ttl).toISOString() : 'never',
+                size: JSON.stringify(value).length
+            };
+        });
+
+        return details;
     }
 }
 
