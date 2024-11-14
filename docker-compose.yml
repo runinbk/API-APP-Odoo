@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: .
+    container_name: odoo-mobile-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+      - ./.env:/usr/src/app/.env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - odoo-network
+
+networks:
+  odoo-network:
+    external: true
