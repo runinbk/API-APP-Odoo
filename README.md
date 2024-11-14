@@ -18,6 +18,41 @@ API Gateway para la integración entre una aplicación móvil y un módulo de ag
 ## 💻 Arquitectura
 
 ```mermaid
+flowchart TD
+    subgraph Mobile["Aplicación Flutter"]
+        UI[UI/Screens]
+        LocalDB[(Local Storage/Hive)]
+        ApiClient[API Client]
+    end
+
+    subgraph Backend["Backend"]
+        API[API Gateway/REST]
+        OdooConnector[Odoo Connector]
+        AIService[AI Service]
+    end
+
+    subgraph Odoo["Odoo"]
+        OdooAPI[JSON-RPC API]
+        Database[(PostgreSQL DB)]
+    end
+
+    subgraph AI["Servicios IA"]
+        GPT[GPT-3.5 Turbo]
+        Whisper[Whisper API]
+    end
+
+    UI --> LocalDB
+    UI --> ApiClient
+    ApiClient --> API
+    API --> OdooConnector
+    API --> AIService
+    OdooConnector --> OdooAPI
+    OdooAPI --> Database
+    AIService --> GPT
+    AIService --> Whisper
+```
+
+```mermaid
 graph TD
     subgraph Docker["Docker Host"]
         subgraph Network["Docker Network: odoo-network"]
