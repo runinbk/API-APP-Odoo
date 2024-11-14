@@ -2,20 +2,19 @@ version: '3.8'
 
 services:
   api-gateway:
-    build: .
+    image: runinbk/odoo-mobile-gateway:latest
     container_name: odoo-mobile-gateway
-    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
       - ./uploads:/usr/src/app/uploads
       - ./.env:/usr/src/app/.env
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3000
-    networks:
-      - odoo-network
-
-networks:
-  odoo-network:
-    external: true
+      # Variables de Odoo
+      - ODOO_URL=http://3.143.242.114:8069
+      - ODOO_DB=odoo
+      - JWT_SECRET=C@1@43_$3cr3t@
+      - OPENAI_API_KEY=Tu-clave-openai
+    restart: unless-stopped

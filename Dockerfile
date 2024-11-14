@@ -1,5 +1,5 @@
-# Usar una imagen base de Node.js
-FROM node:20-alpine
+# Usar Node.js imagen oficial
+FROM node:20-slim
 
 # Crear directorio de la aplicación
 WORKDIR /usr/src/app
@@ -10,13 +10,13 @@ COPY package*.json ./
 # Instalar dependencias
 RUN npm install
 
-# Copiar el código fuente
+# Copiar el resto del código
 COPY . .
 
-# Crear directorio de uploads si no existe
+# Crear directorio para uploads si no existe
 RUN mkdir -p uploads
 
-# Exponer el puerto
+# Exponer puerto
 EXPOSE 3000
 
 # Comando para iniciar la aplicación

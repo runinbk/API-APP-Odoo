@@ -302,7 +302,7 @@ Este proyecto está bajo la Licencia ISC - ver el archivo [LICENSE.md](LICENSE.m
 
 - **Diego** - *Trabajo Inicial - Modulo Odoo* - [DAVV422/odoo-sw1](https://github.com/DAVV422)
 - **Kevin** - *Odoo Mobile Gateway API* - [runinbk/API-APP-Odoo](https://github.com/runinbk/API-APP-Odoo)
-- **Heidy** - *App mobile - cliene Odoo* - [Heidy](https://github.com/)
+- **Heidy** - *App mobile - cliene Odoo* - [HeidyOlmosCampos/Odoo-movil](https://github.com/HeidyOlmosCampos/2do-examen-sw1-movil)
 
 ## 🎁 Agradecimientos
 
