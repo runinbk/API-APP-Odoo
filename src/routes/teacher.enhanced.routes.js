@@ -24,58 +24,75 @@ router.get('/my-courses', authMiddleware, async (req, res) => {
     try {
         const { uid, password } = req.user;
         
-        // Primero obtener el ID del profesor
-        const profesor = await odooService.executeKw(
+        console.log('1. Buscando profesor con user_id:', uid);
+        
+        // 1. Obtener el profesor
+        const profesores = await odooService.execute(
             uid, password,
             'colegio.profesor',
             'search_read',
             [[['user_id', '=', uid]]],
-            { fields: ['id'] }
+            { fields: ['id', 'especialidad', 'user_id'] }
         );
 
-        if (!profesor.length) {
-            return res.status(404).json({ message: 'Profesor no encontrado' });
+        if (!profesores.length) {
+            return res.status(404).json({ 
+                message: 'Profesor no encontrado',
+                user_id: uid 
+            });
         }
 
-        // Obtener todas las asignaciones del profesor
-        const asignaciones = await odooService.executeKw(
+        console.log('2. Profesor encontrado:', profesores[0]);
+
+        // 2. Obtener asignaciones con datos relacionados en una sola consulta
+        const asignaciones = await odooService.execute(
             uid, password,
             'colegio.asignacion',
             'search_read',
-            [[['profesor_id', '=', profesor[0].id]]],
-            { fields: ['curso_id', 'materia_id'] }
+            [[['profesor_id', '=', profesores[0].id]]],
+            { 
+                fields: [
+                    'id',
+                    'curso_id',      // Relación Many2one
+                    'materia_id',    // Relación Many2one
+                    'gestion_id'     // Relación Many2one
+                ] 
+            }
         );
 
-        // Obtener detalles de cada curso y materia
-        const cursosConMaterias = await Promise.all(
-            asignaciones.map(async (asignacion) => {
-                const [curso, materia] = await Promise.all([
-                    odooService.executeKw(
-                        uid, password,
-                        'colegio.curso',
-                        'read',
-                        [asignacion.curso_id[0]],
-                        { fields: ['nombre', 'nivel'] }
-                    ),
-                    odooService.executeKw(
-                        uid, password,
-                        'colegio.materia',
-                        'read',
-                        [asignacion.materia_id[0]],
-                        { fields: ['nombre', 'descripcion'] }
-                    )
-                ]);
+        console.log('3. Asignaciones encontradas:', asignaciones.length);
 
-                return {
-                    curso: curso[0],
-                    materia: materia[0]
-                };
-            })
-        );
+        // 3. Construir respuesta con los datos disponibles
+        const asignacionesFormateadas = asignaciones.map(asignacion => ({
+            id: asignacion.id,
+            curso: {
+                id: asignacion.curso_id[0],
+                nombre: asignacion.curso_id[1]
+            },
+            materia: {
+                id: asignacion.materia_id[0],
+                nombre: asignacion.materia_id[1]
+            },
+            gestion: {
+                id: asignacion.gestion_id[0],
+                nombre: asignacion.gestion_id[1]
+            }
+        }));
 
-        res.json(cursosConMaterias);
+        // 4. Enviar respuesta estructurada
+        res.json({
+            profesor: {
+                id: profesores[0].id,
+                user_id: profesores[0].user_id[0],
+                nombre: profesores[0].user_id[1],
+                especialidad: profesores[0].especialidad
+            },
+            total_asignaciones: asignacionesFormateadas.length,
+            asignaciones: asignacionesFormateadas
+        });
+
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error general:', error);
         res.status(500).json({
             message: 'Error al obtener cursos',
             error: error.message
@@ -89,8 +106,10 @@ router.get('/course/:courseId/students', authMiddleware, async (req, res) => {
         const { uid, password } = req.user;
         const courseId = parseInt(req.params.courseId);
 
-        // Verificar que el profesor tenga asignación en este curso
-        const profesor = await odooService.executeKw(
+        console.log('1. Verificando acceso del profesor al curso:', courseId);
+
+        // 1. Verificar que el profesor tenga asignación en este curso
+        const profesor = await odooService.execute(
             uid, password,
             'colegio.profesor',
             'search_read',
@@ -98,36 +117,56 @@ router.get('/course/:courseId/students', authMiddleware, async (req, res) => {
             { fields: ['id'] }
         );
 
-        const tieneAsignacion = await odooService.executeKw(
+        if (!profesor.length) {
+            return res.status(404).json({ 
+                message: 'Profesor no encontrado' 
+            });
+        }
+
+        // 2. Verificar y obtener información de la asignación
+        const asignacion = await odooService.execute(
             uid, password,
             'colegio.asignacion',
-            'search_count',
+            'search_read',
             [[
                 ['profesor_id', '=', profesor[0].id],
                 ['curso_id', '=', courseId]
-            ]]
+            ]],
+            { 
+                fields: [
+                    'curso_id',
+                    'materia_id',
+                    'gestion_id'
+                ] 
+            }
         );
 
-        if (!tieneAsignacion) {
+        if (!asignacion.length) {
             return res.status(403).json({ 
                 message: 'No tiene acceso a este curso' 
             });
         }
 
-        // Obtener alumnos del curso
-        const alumnos = await odooService.executeKw(
-            uid, password,
-            'colegio.alumno',
-            'search_read',
-            [[['grado', '=', courseId]]],
-            { fields: ['user_id', 'edad'] }
-        );
+        // 3. Devolver información disponible
+        res.json({
+            curso: {
+                id: asignacion[0].curso_id[0],
+                nombre: asignacion[0].curso_id[1]
+            },
+            materia: {
+                id: asignacion[0].materia_id[0],
+                nombre: asignacion[0].materia_id[1]
+            },
+            gestion: {
+                id: asignacion[0].gestion_id[0],
+                nombre: asignacion[0].gestion_id[1]
+            }
+        });
 
-        res.json(alumnos);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({
-            message: 'Error al obtener alumnos',
+            message: 'Error al obtener información del curso',
             error: error.message
         });
     }
@@ -176,7 +215,7 @@ router.get('/student/:studentId/pending-activities', authMiddleware, async (req,
 });
 
 // Crear actividad
-router.post('/create-activity', authMiddleware, upload.array('files'), async (req, res) => {
+router.post('/create-activity', authMiddleware, async (req, res) => {
     try {
         const { uid, password } = req.user;
         const {
@@ -185,74 +224,62 @@ router.post('/create-activity', authMiddleware, upload.array('files'), async (re
             fecha,
             hora,
             fecha_cierre,
-            tipo_destinatario,  // 'alumno', 'varios_alumnos', 'curso'
-            curso_id,
-            student_ids
+            tipo_destinatario,
+            curso_id
         } = req.body;
 
-        // Crear attachments en Odoo para los archivos subidos
-        const attachmentIds = await Promise.all(
-            (req.files || []).map(async (file) => {
-                const attachmentData = {
-                    name: file.originalname,
-                    datas: Buffer.from(file.buffer).toString('base64'),
-                    res_model: 'colegio.notificacion',
-                    type: 'binary',
-                    mimetype: file.mimetype
-                };
+        // Convertir hora (HH:mm) a float (HH.mm)
+        const horaFloat = hora.split(':').reduce((acc, time) => {
+            return parseFloat(acc) + parseFloat(time) / 60;
+        });
 
-                return await odooService.executeKw(
-                    uid, password,
-                    'ir.attachment',
-                    'create',
-                    [attachmentData]
-                );
-            })
-        );
+        console.log('1. Datos de la actividad:', {
+            titulo,
+            curso_id,
+            tipo_destinatario,
+            horaFloat
+        });
 
-        // Determinar los destinatarios
-        let user_ids = [];
-        if (tipo_destinatario === 'curso' && curso_id) {
-            const alumnos = await odooService.executeKw(
-                uid, password,
-                'colegio.alumno',
-                'search_read',
-                [[['grado', '=', parseInt(curso_id)]]],
-                { fields: ['user_id'] }
-            );
-            user_ids = alumnos.map(alumno => alumno.user_id[0]);
-        } else if (tipo_destinatario === 'varios_alumnos' && student_ids) {
-            user_ids = JSON.parse(student_ids);
-        } else if (tipo_destinatario === 'alumno' && student_ids) {
-            user_ids = [parseInt(student_ids)];
-        }
+        // ... resto de verificaciones ...
 
-        // Crear la notificación
-        const notificacionId = await odooService.executeKw(
-            uid, password,
+        // Crear la notificación con la hora en formato correcto
+        const notificacion = await odooService.execute(
+            uid,
+            password,
             'colegio.notificacion',
             'create',
             [{
                 titulo,
                 mensaje,
                 fecha,
-                hora,
+                hora: horaFloat,  // Aquí usamos el float convertido
                 fecha_cierre,
                 tipo: 'actividad',
-                user_ids: [[6, 0, user_ids]],
-                attachment_ids: [[6, 0, attachmentIds]],
+                tipo_destinatario,
+                curso_id: parseInt(curso_id),
                 creado_por: uid
             }]
         );
 
         res.status(201).json({
             message: 'Actividad creada exitosamente',
-            id: notificacionId
+            notificacion_id: notificacion,
+            data: {
+                titulo,
+                mensaje,
+                fecha,
+                hora,
+                hora_float: horaFloat,
+                fecha_cierre,
+                tipo_destinatario,
+                curso_id
+            }
         });
+
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error al crear actividad:', error);
         res.status(500).json({
-            message: 'Error al crear actividad',
+            message: 'Error al crear la actividad',
             error: error.message
         });
     }

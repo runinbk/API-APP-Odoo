@@ -102,6 +102,12 @@ class OdooService {
 
     async execute(uid, password, model, method, args = [], kwargs = {}) {
         try {
+            console.log('Ejecutando método en Odoo:', {
+                model,
+                method,
+                args
+            });
+    
             const response = await axios.post(`${this.baseUrl}/jsonrpc`, {
                 jsonrpc: '2.0',
                 method: 'call',
@@ -119,11 +125,12 @@ class OdooService {
                     ]
                 }
             });
-
+    
             if (response.data.error) {
+                console.error('Error de Odoo:', response.data.error);
                 throw new Error(response.data.error.data?.message || 'Error en Odoo');
             }
-
+    
             return response.data.result;
         } catch (error) {
             console.error('Error en execute:', error);
