@@ -205,3 +205,9 @@ COPY . .
 
 CMD ["python", "app.py"]
 ```
+
+# Otros temas a profundizar
+
+- [**Dockerización**](Dockerizacion.md) -> Dockerfile, docker-compose y otras excentricidades.
+- [**Redes Docker**](Tipos-de-Redes-en-Docker.md) -> Tipos de redes en Docker.
+- [**Volumenes Docker**](Tipos-de-Volumenes-en-Docker.md) -> Tipos de Volumenes en Docker.
