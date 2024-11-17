@@ -153,3 +153,127 @@ docker-compose logs -f
 Deberías ver la pantalla de inicio de Odoo donde puedes:
 - Crear una nueva base de datos
 - Configurar el sistema por primera vez
+
+# Diagramas
+
+Para ver estos diagramas ir a la pagina de focial de [```Mermaid```](https://mermaid.live/edit) y pegar el codigo para generar los diagramas.
+
+## Arquitectura Docker de Odoo
+
+```mermaid
+graph TD
+    subgraph Volumes["Volúmenes Persistentes"]
+        V1[("odoo-web-data\n/var/lib/odoo")]
+        V2[("odoo-db-data\n/var/lib/postgresql/data/pgdata")]
+        V3[("api-uploads\n/usr/src/app/uploads")]
+    end
+
+    subgraph Network["Red Docker: odoo-network"]
+        subgraph Web["Contenedor Web (Odoo)"]
+            O1[Servicio Odoo]
+            O2[Extra Addons]
+            O3[Configuración]
+        end
+
+        subgraph DB["Contenedor DB (PostgreSQL)"]
+            P1[PostgreSQL 13]
+        end
+
+        subgraph API["Contenedor API Gateway"]
+            A1[Node.js API]
+            A2[OpenAI Integration]
+        end
+    end
+
+    %% Conexiones de red
+    API --> Web
+    Web --> DB
+
+    %% Conexiones de volúmenes
+    V1 -.- O1
+    V2 -.- P1
+    V3 -.- A1
+
+    %% Puertos expuestos
+    External1[("Puerto 8069\nAcceso Odoo")] -.- Web
+    External2[("Puerto 3000\nAcceso API")] -.- API
+```
+
+## Tipos de Redes Docker y Ejemplos
+
+```mermaid
+graph TD
+    subgraph Host["Host Docker"]
+        subgraph Bridge["Red Bridge (Default)"]
+            O[Odoo Web]
+            DB[PostgreSQL]
+            API[API Gateway]
+            O <--> DB
+            O <--> API
+        end
+        
+        subgraph Host_Network["Red Host"]
+            HN[Container con\nacceso directo\nal host]
+        end
+        
+        subgraph Overlay["Red Overlay (Swarm)"]
+            S1[Servicio 1]
+            S2[Servicio 2]
+            S3[Servicio 3]
+            S1 <--> S2
+            S2 <--> S3
+            S1 <--> S3
+        end
+        
+        subgraph None["Red None"]
+            ISO[Contenedor\nAislado]
+        end
+        
+        subgraph Custom["Red Personalizada"]
+            C1[Frontend]
+            C2[Backend]
+            C3[Cache]
+            C1 <--> C2
+            C2 <--> C3
+        end
+    end
+
+    Internet((Internet)) --> Bridge
+    Internet --> Host_Network
+    Internet --> Overlay
+```
+
+## Tipos y Usos de Volúmenes Docker
+
+```mermaid
+graph TD
+    subgraph Host["Host Docker"]
+        subgraph NamedVolumes["Volúmenes Nombrados"]
+            V1[("odoo-web-data\nDatos de la aplicación")]
+            V2[("odoo-db-data\nDatos PostgreSQL")]
+            V3[("api-uploads\nArchivos subidos")]
+        end
+        
+        subgraph BindMounts["Bind Mounts"]
+            B1["./odoo.conf\n↔\n/etc/odoo/odoo.conf"]
+            B2["./extra_addons\n↔\n/mnt/extra-addons"]
+        end
+        
+        subgraph tmpfs["tmpfs Mounts"]
+            T1[("Archivos Temporales\nEn memoria")]
+        end
+    end
+
+    subgraph Containers["Contenedores"]
+        C1[Odoo Web]
+        C2[PostgreSQL]
+        C3[API Gateway]
+    end
+
+    V1 --> C1
+    V2 --> C2
+    V3 --> C3
+    B1 --> C1
+    B2 --> C1
+    T1 --> C1
+```

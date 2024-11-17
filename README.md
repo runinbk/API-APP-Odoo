@@ -14,6 +14,13 @@ API Gateway para la integración entre una aplicación móvil y un módulo de ag
 - [Ejemplos](#ejemplos)
 - [Consideraciones de Seguridad](#consideraciones-de-seguridad)
 
+### 💬 Otros temas a profundizar
+
+- [**Dockerización**](/docs/Dockerizacion.md) -> Dockerfile, docker-compose y otras excentricidades.
+- [**Redes Docker**](/docs/Tipos-de-Redes-en-Docker.md) -> Tipos de redes en Docker.
+- [**Volumenes Docker**](/docs/Tipos-de-Volumenes-en-Docker.md) -> Tipos de Volumenes en Docker.
+- [**Imagenes Docker**](/docs/Creación-y-Gestión-de-Imágenes-Docker.md) -> Creación y Gestión de Imágenes Docker.
+
 
 ## 💻 Arquitectura
 
